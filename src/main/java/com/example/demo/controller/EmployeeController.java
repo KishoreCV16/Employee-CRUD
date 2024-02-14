@@ -1,9 +1,10 @@
 package com.example.demo.controller;
 
-import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,8 +24,13 @@ public class EmployeeController {
     private EmployeeService employeeService;
 
     @GetMapping("/getemployees")
-    public List<Employee> getEmployees() {
-        return employeeService.getEmployees();
+    public ResponseEntity<Page<Employee>> getEmployees(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "employeeName") String sort) {
+
+        Page<Employee> employees = employeeService.getAllEmployees(page, size, sort);
+        return ResponseEntity.ok(employees);
     }
 
     @PostMapping("/saveemployee")
@@ -46,4 +52,18 @@ public class EmployeeController {
         employeeService.deleteEmployee(id);
         return "Employee with ID " + id + " deleted successfully.";
     }
+    
+    @GetMapping("/getnthlevelmanager/{employeeId}/{level}")
+    public ResponseEntity<Employee> getNthLevelManager(
+            @PathVariable UUID employeeId,
+            @PathVariable int level) {
+
+        Employee manager = employeeService.getNthLevelManager(employeeId, level);
+        if (manager != null) {
+            return ResponseEntity.ok(manager);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    
 }
