@@ -19,6 +19,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Autowired
     private EmployeeRepository employeeRepository;
     
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public Page<Employee> getAllEmployees(int pageNumber, int pageSize, String sortBy) {
@@ -44,9 +46,42 @@ public class EmployeeServiceImpl implements EmployeeService {
             }
         }
         Employee savedEmployee = employeeRepository.save(employee);
+        sendEmailToLevel1Manager(savedEmployee);
         return savedEmployee.getId();
     }
+    
+    private void sendEmailToLevel1Manager(Employee employee) {
+        // Logic to determine the level 1 manager of the employee
+        Employee manager = findLevel1Manager(employee);
 
+        // Construct email content
+        String subject = "New Employee Addition: " + employee.getEmployeeName();
+        String message = employee.getEmployeeName() + " will now work under you. Mobile number is " +
+                         employee.getPhoneNumber() + " and email is " + employee.getEmail();
+
+        // Send email notification
+        emailService.sendEmail(manager.getEmail(), subject, message);
+    }
+
+    private Employee findLevel1Manager(Employee employee) {
+        if (employee == null || employee.getReportsTo() == null) {
+            return null;
+        }
+
+        // Get the ID of the manager of the given employee
+        UUID managerId = employee.getReportsTo();
+
+        // Retrieve the manager from the repository
+        Optional<Employee> managerOptional = employeeRepository.findById(managerId);
+
+        // Check if the manager exists
+        if (managerOptional.isPresent()) {
+            return managerOptional.get();
+        } else {
+            return null; // Manager not found
+        }
+    }
+    
     @Override
     public void deleteEmployee(UUID id) {
         employeeRepository.deleteById(id);
