@@ -1,7 +1,7 @@
 # Employee Management System
 
 ## Introduction
-This project is an Employee Management System that allows users to perform CRUD operations on employees.
+This project is an Employee Management System that allows users to perform CRUD operations on employees and also generates an email to the respective manager for each newly added employee (make you use a valid mail id).
 
 ## Prerequisites
 - Java Development Kit (JDK) 8 or higher
