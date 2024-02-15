@@ -1,8 +1,7 @@
 package com.example.demo.service;
 
-import java.util.Optional;
-import java.util.UUID;
-
+import com.example.demo.model.Employee;
+import com.example.demo.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,15 +9,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.model.Employee;
-import com.example.demo.repository.EmployeeRepository;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
     @Autowired
     private EmployeeRepository employeeRepository;
-    
+
     @Autowired
     private EmailService emailService;
 
@@ -29,30 +28,33 @@ public class EmployeeServiceImpl implements EmployeeService {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
         return employeeRepository.findAll(pageable);
     }
-    
+
     @Override
     public UUID saveEmployee(Employee employee) {
-    	if (employeeRepository.count() == 0) {
-            employee.setReportsTo(null);
+    	long count = employeeRepository.count();
+        if (count == 0) {
+            Employee savedEmployee = employeeRepository.save(employee);
+            return savedEmployee.getId();
         } else {
-            UUID reportsToId = employee.getReportsTo();
-            if (reportsToId != null) {
-                Optional<Employee> reportsToEmployeeOptional = employeeRepository.findById(reportsToId);
+            if (employee.getReportsTo() != null) {
+                Optional<Employee> reportsToEmployeeOptional = employeeRepository.findById(employee.getReportsTo());
                 if (!reportsToEmployeeOptional.isPresent()) {
-                    throw new RuntimeException("Reporting employee with ID " + reportsToId + " not found");
+                    throw new RuntimeException("Reporting employee with ID " + employee.getReportsTo() + " not found");
                 }
             }
+            Employee savedEmployee = employeeRepository.save(employee);
+            sendEmailToLevel1Manager(savedEmployee);
+            return savedEmployee.getId();
         }
-        Employee savedEmployee = employeeRepository.save(employee);
-        sendEmailToLevel1Manager(savedEmployee);
-        return savedEmployee.getId();
     }
-    
+
+
+
     private void sendEmailToLevel1Manager(Employee employee) {
         Employee manager = findLevel1Manager(employee);
         String subject = "New Employee Addition: " + employee.getEmployeeName();
         String message = employee.getEmployeeName() + " will now work under you. Mobile number is " +
-                         employee.getPhoneNumber() + " and email is " + employee.getEmail();
+                employee.getPhoneNumber() + " and email is " + employee.getEmail();
         emailService.sendEmail(manager.getEmail(), subject, message);
     }
 
@@ -68,7 +70,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             return null;
         }
     }
-    
+
     @Override
     public void deleteEmployee(UUID id) {
         employeeRepository.deleteById(id);
@@ -84,7 +86,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         return employeeRepository.save(employee);
     }
-    
+
     public Employee getNthLevelManager(UUID employeeId, int level) {
         Optional<Employee> employeeOptional = employeeRepository.findById(employeeId);
         if (employeeOptional.isPresent()) {
@@ -107,5 +109,5 @@ public class EmployeeServiceImpl implements EmployeeService {
             return null;
         }
     }
-    
+
 }

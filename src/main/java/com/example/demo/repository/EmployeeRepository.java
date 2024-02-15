@@ -1,13 +1,11 @@
 package com.example.demo.repository;
 
-import java.util.UUID;
-
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.demo.model.Employee;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.demo.model.Employee;
+import java.util.UUID;
 
 @Repository
-public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
-	
+public interface EmployeeRepository extends MongoRepository<Employee, UUID> {
 }
