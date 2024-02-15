@@ -10,16 +10,17 @@ This project is an Employee Management System that allows users to perform CRUD 
 
 ## Setup
 1. Clone the repository to your local machine:
-   git clone https://github.com/your-username/employee-management-system.git
+   git clone https://github.com/KishoreCV16/Employee-CRUD
 2. Navigate to the project directory:
    cd employee-management-system
 3. Configure the database settings in `application.properties` file located in `src/main/resources`:
 
-   spring.datasource.url=jdbc:mysql://localhost:3306/employee_db
+   spring.data.mongodb.host=localhost
 
-   spring.datasource.username=root
+   spring.data.mongodb.port=27017
 
-   spring.datasource.password=password
+   spring.data.mongodb.database=Project
+   
 5. Run the application:
    mvn spring-boot:run
 
