@@ -45,7 +45,7 @@ This project is an Employee Management System that allows users to perform CRUD 
 
   "email": "john@example.com",
 
-  "reportsTo": "managerId",
+  "reportsTo": "managerId (00000000-0000-0000-0000-000000000000)",
 
   "profileImage": "http://example.com/profile.jpg"
 
