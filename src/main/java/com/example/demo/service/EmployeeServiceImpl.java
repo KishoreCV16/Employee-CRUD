@@ -24,7 +24,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Page<Employee> getAllEmployees(int pageNumber, int pageSize, String sortBy) {
-        Sort sort = Sort.by(sortBy).ascending(); // You can customize sorting criteria here
+        Sort sort = Sort.by(sortBy).ascending();
 
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
         return employeeRepository.findAll(pageable);
@@ -33,10 +33,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public UUID saveEmployee(Employee employee) {
     	if (employeeRepository.count() == 0) {
-            // This is the first employee, you can handle the reportsTo field here
-            employee.setReportsTo(null); // or set to a default value
+            employee.setReportsTo(null);
         } else {
-            // Check if the reportsTo ID exists
             UUID reportsToId = employee.getReportsTo();
             if (reportsToId != null) {
                 Optional<Employee> reportsToEmployeeOptional = employeeRepository.findById(reportsToId);
@@ -51,15 +49,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
     
     private void sendEmailToLevel1Manager(Employee employee) {
-        // Logic to determine the level 1 manager of the employee
         Employee manager = findLevel1Manager(employee);
-
-        // Construct email content
         String subject = "New Employee Addition: " + employee.getEmployeeName();
         String message = employee.getEmployeeName() + " will now work under you. Mobile number is " +
                          employee.getPhoneNumber() + " and email is " + employee.getEmail();
-
-        // Send email notification
         emailService.sendEmail(manager.getEmail(), subject, message);
     }
 
@@ -67,18 +60,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         if (employee == null || employee.getReportsTo() == null) {
             return null;
         }
-
-        // Get the ID of the manager of the given employee
         UUID managerId = employee.getReportsTo();
-
-        // Retrieve the manager from the repository
         Optional<Employee> managerOptional = employeeRepository.findById(managerId);
-
-        // Check if the manager exists
         if (managerOptional.isPresent()) {
             return managerOptional.get();
         } else {
-            return null; // Manager not found
+            return null;
         }
     }
     
