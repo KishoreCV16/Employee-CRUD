@@ -74,13 +74,13 @@ This project is an Employee Management System that allows users to perform CRUD 
   }
 
   ### 5. DELETE Delete Employee
-- URL: /api/deleteemployee/{id}
+- URL: /api/v1/deleteemployee/{id}
 - Method: DELETE
 - Description: Deletes an employee by ID.
 - Input: None
 
 ### 6. GET Nth Level Manager of Employee
-- URL: /api/getnthlevelmanager/{employeeId}/{level}
+- URL: /api/v1/getnthlevelmanager/{employeeId}/{level}
 - Method: GET
 - Description: Retrieves the Nth level manager of an employee.
 - Input: None
